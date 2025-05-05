@@ -14,8 +14,6 @@ from src.services.utils import padronizar, validacao_cadastro_completa, validaca
 
 from flasgger import swag_from # Classe que faz a documentação em yml
 
-from sqlalchemy.exc import IntegrityError
-
 # Anteriormente usava se uma lista de dicionario com dados como banco de dados Mockado
 
 # Blueprint -> Conceito de dividir as rotas 
@@ -25,19 +23,23 @@ bp_colaborador = Blueprint('colaborador', __name__, url_prefix='/colaborador') #
 @bp_colaborador.route('/todos-colaboradores')
 @swag_from('../docs/colaborador/listar_colaboradores.yml') # Integra a função com a documentação desse 'caminho'
 def pegar_dados_todos_colaboradores():
-    # Criando uma lista de objetos de Colaboradores
-    # return dados # Uma rota sempre retorna algo
-    # Instancia do Banco de Dados = db
-    colaboradores = db.session.execute(
-        db.select(Colaborador) # Classe Colaborador é o molde para criar a tabela
-    ).scalars().all() # AO inves de trazer 1 dado trás todos 
-    
-    if not colaboradores:
-        return jsonify({'response': 'Não há dados para retornar'}), 204
-    
-    colaboradores = [ colaborador.all_data() for colaborador in colaboradores ]  # Está adicionando cada colaborador dentro do Dicionário Colaboradores
-    # Execute essa expressão, para cada          item do         iteravel
-    return jsonify(colaboradores), 200
+    try:
+        # Criando uma lista de objetos de Colaboradores
+        # return dados # Uma rota sempre retorna algo
+        # Instancia do Banco de Dados = db
+        colaboradores = db.session.execute(
+            db.select(Colaborador) # Classe Colaborador é o molde para criar a tabela
+        ).scalars().all() # AO inves de trazer 1 dado trás todos 
+        
+        if not colaboradores:
+            return jsonify({'response': 'Não há dados para retornar'}), 204
+        
+        colaboradores = [ colaborador.all_data() for colaborador in colaboradores ]  # Está adicionando cada colaborador dentro do Dicionário Colaboradores
+        # Execute essa expressão, para cada          item do         iteravel
+        return jsonify(colaboradores), 200
+    except Exception as e:
+        # Aqui indica um erro na requisição
+        return jsonify({'erro': 'Erro interno no servidor', 'detalhe': str(e)}), 500
 
 # Rota cadastrar só vai receber requisições com o método POST
 @bp_colaborador.route('/cadastrar', methods=['POST']) # Colchetes indica que o retorno pode ser uma lista
@@ -139,20 +141,20 @@ def login():
     else:
         return jsonify({'mensagem': 'Senha incorreta'}), 401 # Resposta da senha incorreta
     
-@bp_colaborador.route('deletar/<int:id_colaborador>', methods=['DELETE'])
-@swag_from('../docs/colaborador/deletar_colaborador.yml') # Integra a função com a documentação desse 'caminho'
-def deletar_por_id(id_colaborador):
-    colaborador = db.session.get(Colaborador, id_colaborador) # Buscando o colaborador pelo id 
+# @bp_colaborador.route('deletar/<int:id_colaborador>', methods=['DELETE'])
+# @swag_from('../docs/colaborador/deletar_colaborador.yml') # Integra a função com a documentação desse 'caminho'
+# def deletar_por_id(id_colaborador):
+#     colaborador = db.session.get(Colaborador, id_colaborador) # Buscando o colaborador pelo id 
     
-    # Erro para caso o id_colaborador não exista no banco de dados
-    if not colaborador:
-        return jsonify({'erro': 'Colaborador não encontrado'}), 404
+#     # Erro para caso o id_colaborador não exista no banco de dados
+#     if not colaborador:
+#         return jsonify({'erro': 'Colaborador não encontrado'}), 404
 
-    try:
-        db.session.delete(colaborador) # Deletando o colaborador encontrado
-        db.session.commit() # executando a ação
-        return jsonify({'mensagem': f'Colaborador {colaborador.email} deletado com sucesso'}), 200
+#     try:
+#         db.session.delete(colaborador) # Deletando o colaborador encontrado
+#         db.session.commit() # executando a ação
+#         return jsonify({'mensagem': f'Colaborador {colaborador.email} deletado com sucesso'}), 200
     
-    except IntegrityError:
-        db.session.rollback()
-        return jsonify({'erro': f'Não é possível excluir o colaborador ({colaborador.email}), pois há registros relacionados'}), 400
+#     except IntegrityError:
+#         db.session.rollback()
+#         return jsonify({'erro': f'Não é possível excluir o colaborador ({colaborador.email}), pois há registros relacionados'}), 400

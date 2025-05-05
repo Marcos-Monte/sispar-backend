@@ -28,16 +28,19 @@ bp_reembolso = Blueprint('reembolso', __name__, url_prefix='/reembolso')# https:
 @bp_reembolso.route('/reembolsos')
 @swag_from('../docs/reembolso/listar_reembolsos.yml')
 def pegar_todos_reembolsos():
-    reembolsos = db.session.execute(
-        db.select(Reembolso)
-    ).scalars().all()
-    
-    if not reembolsos:
-        return jsonify({'response': 'Não há reembolsos cadastrados'}), 200
-    
-    reembolsos = [ reembolso.all_data() for reembolso in reembolsos ]
-    
-    return jsonify(reembolsos), 200
+    try:
+        reembolsos = db.session.execute(
+            db.select(Reembolso)
+        ).scalars().all()
+        
+        if not reembolsos:
+            return jsonify({'response': 'Não há reembolsos cadastrados'}), 200
+        
+        reembolsos = [ reembolso.all_data() for reembolso in reembolsos ]
+        
+        return jsonify(reembolsos), 200
+    except Exception as e:
+        return jsonify({'erro': 'Erro interno no servidor', 'detalhes': str(e)}), 500
 
 @bp_reembolso.route('/solicitacao', methods=['POST'])
 def solicitar_novo_reembolso():

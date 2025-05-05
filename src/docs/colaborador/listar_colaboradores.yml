@@ -4,5 +4,5 @@ description: Retorna a lista de todos os colaboradores cadastrados
 responses:
   200:
     description: Lista de Colaboradores
-  204:
-    description: Não há dados para retornar
+  500:
+    description: Erro interno no servidor
