@@ -1,0 +1,17 @@
+tags:
+  - Reembolso
+description: Retorna a lista de todos os reembolsos solicitados
+responses:
+  200:
+    description: Requisição processada com sucesso
+    content:
+      application/json:
+        examples:
+          sem_dados:
+            summary: Requisição retorna vazia
+            value:
+              mensagem: Não há reembolsos cadastrados
+          lista_dados:
+            summary: Requisição retorna a lista de reembolsos
+            value:
+              mensagem: Lista de Reembolsos

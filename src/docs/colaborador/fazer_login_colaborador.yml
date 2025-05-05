@@ -1,0 +1,30 @@
+tags:
+  - Colaborador
+description: Autenticar e fazer login na aplicação como um colaborador
+
+parameters:
+  - in: body
+    name: corpo
+    required: true
+
+    schema:
+      type: object
+      properties:
+        email: 
+          type: string
+          example: jojo@email.com
+        senha:
+          type: string
+          example: senha123
+      required:
+        - email
+        - senha
+
+responses:
+  200:
+    description: Login de (nome) realizado com sucesso
+  404:
+    description: Usuário não encontrado
+  401:
+    description: Senha incorreta
+    

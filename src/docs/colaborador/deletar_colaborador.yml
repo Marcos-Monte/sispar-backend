@@ -1,0 +1,19 @@
+tags:
+  - Colaborador
+description: Deletar um colaborador existente
+
+parameters:
+  - in: path
+    name: id_colaborador
+    required: true
+    schema:
+      type: number
+    description: ID do colaborador a ser deletado
+
+responses: 
+  200:
+    description: Colaborador (email) deletado com sucesso
+  404:
+    description: Colaborador não encontrado
+  400:
+    description: Não é possível excluir o colaborador (email), pois há registros relacionados
