@@ -38,18 +38,5 @@ responses:
     description: Dados do colaborador atualizados com sucesso
   400:
     description: Erro na requisição
-    content:
-      application/json:
-        examples:
-          sem_corpo:
-            summary: Requisição sem corpo
-            value:
-              mensagem: "Nenhum dado foi enviado"
-          dados_faltando:
-            summary: Dados obrigatórios faltando
-            value:
-              mensagem: "Campo obrigatório (campo) não foi preenchido"
-          formato_email_invalido:
-            summary: Formato do e-mail inválido
-            value:
-              mensagem: "Formato do e-mail (email) é inválido!"
+  500:
+    description: Erro inesperado ao processar a requisição

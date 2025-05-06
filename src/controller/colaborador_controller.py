@@ -37,40 +37,43 @@ def pegar_dados_todos_colaboradores():
         colaboradores = [ colaborador.all_data() for colaborador in colaboradores ]  # Está adicionando cada colaborador dentro do Dicionário Colaboradores
         # Execute essa expressão, para cada          item do         iteravel
         return jsonify(colaboradores), 200
-    except Exception as e:
+    except Exception as error:
         # Aqui indica um erro na requisição
-        return jsonify({'erro': 'Erro interno no servidor', 'detalhe': str(e)}), 500
+        return jsonify({'erro': 'Erro inesperado ao processar a requisição', 'detalhe': str(error)}), 500
 
 # Rota cadastrar só vai receber requisições com o método POST
 @bp_colaborador.route('/cadastrar', methods=['POST']) # Colchetes indica que o retorno pode ser uma lista
 @swag_from('../docs/colaborador/cadastrar_colaborador.yml') # Integra a função com a documentação desse 'caminho'
 def cadastrar_novo_coladorador():
-    campos_obrigatorios = ['nome', 'email', 'senha', 'cargo', 'salario']
-    dados_requisicao = request.get_json() # Pegando o corpo da requisição enviada pelo Front
-    dados_requisicao = padronizar(dados_requisicao) # Padronizando chaves e valores do dicionario
-    
-    # Validações: função utilitária
-    erro = validacao_cadastro_completa(campos_obrigatorios, dados_requisicao)
-    if erro:
-        return erro
-    
-    # Criando novo dicionário nos moldes da classe 'Colaborador'
-    novo_colaborador = Colaborador(
-        nome=dados_requisicao['nome'],
-        email=dados_requisicao['email'],
-        senha=hash_senha(dados_requisicao['senha']), # Criptografando a senha
-        cargo=dados_requisicao['cargo'],
-        salario=dados_requisicao['salario']
-    )
-    
-    # INSERT INTO tb_colaborador (nome, email, senha cargo, salario) 
-    # VALUES (
-        # dados_requisicao['nome'], dados_requisicao['email'], dados_requisicao['senha'], dados_requisicao['cargo'], dados_requisicao['salario']
-    #)
-    db.session.add(novo_colaborador)
-    db.session.commit() # Faz o commit no banco de dados, persistindo os dados
-    
-    return jsonify({'response': 'Colaborador cadastrado com sucesso'}), 201 # Retorna mensagem de sucesso e o Status Code de 'created'
+    try:
+        campos_obrigatorios = ['nome', 'email', 'senha', 'cargo', 'salario']
+        dados_requisicao = request.get_json() # Pegando o corpo da requisição enviada pelo Front
+        dados_requisicao = padronizar(dados_requisicao) # Padronizando chaves e valores do dicionario
+        
+        # Validações: função utilitária
+        erro = validacao_cadastro_completa(campos_obrigatorios, dados_requisicao)
+        if erro:
+            return erro
+        
+        # Criando novo dicionário nos moldes da classe 'Colaborador'
+        novo_colaborador = Colaborador(
+            nome=dados_requisicao['nome'],
+            email=dados_requisicao['email'],
+            senha=hash_senha(dados_requisicao['senha']), # Criptografando a senha
+            cargo=dados_requisicao['cargo'],
+            salario=dados_requisicao['salario']
+        )
+        
+        # INSERT INTO tb_colaborador (nome, email, senha cargo, salario) 
+        # VALUES (
+            # dados_requisicao['nome'], dados_requisicao['email'], dados_requisicao['senha'], dados_requisicao['cargo'], dados_requisicao['salario']
+        #)
+        db.session.add(novo_colaborador)
+        db.session.commit() # Faz o commit no banco de dados, persistindo os dados
+        
+        return jsonify({'response': 'Colaborador cadastrado com sucesso'}), 201 # Retorna mensagem de sucesso e o Status Code de 'created'
+    except Exception as error:
+        return jsonify({'erro': 'Erro inesperado ao processar a requisição', 'detalhe': str(error)}), 500
 
 # SInaliza que os dados enviados após o 'atualizar', serão dinamicos e enviados pela URL
 # https://localhost:8000/colaborador/atualizar/500 --> O ID deve estar passando assim
@@ -78,68 +81,74 @@ def cadastrar_novo_coladorador():
 @swag_from('../docs/colaborador/atualizar_colaborador.yml') # Integra a função com a documentação desse 'caminho'
 def atualizar_dados_colaborador(id_colaborador):
 
-    dados_requisicao = request.get_json() # Pegando o corpo da requisição enviada pelo Front
-    dados_requisicao = padronizar(dados_requisicao) # Padronizando chaves e valores do dicionario
-    
-    # Validações: função utilitária
-    erro = validacao_atualização_colaborador(dados_requisicao)
-    if erro:
-        return erro
-    
-    colaborador = db.session.get(Colaborador, id_colaborador) # Buscando o colaborador pelo id 
+    try:
+        dados_requisicao = request.get_json() # Pegando o corpo da requisição enviada pelo Front
+        dados_requisicao = padronizar(dados_requisicao) # Padronizando chaves e valores do dicionario
+        
+        # Validações: função utilitária
+        erro = validacao_atualização_colaborador(dados_requisicao)
+        if erro:
+            return erro
+        
+        colaborador = db.session.get(Colaborador, id_colaborador) # Buscando o colaborador pelo id 
 
-    # Vaalidação se o ID existe na aplicação
-    if not colaborador:
-        return jsonify({'response': 'Id de usuário não identificado'}), 404
+        # Vaalidação se o ID existe na aplicação
+        if not colaborador:
+            return jsonify({'response': 'Id de usuário não identificado'}), 404
 
-    if 'nome' in dados_requisicao:
-        colaborador.nome = dados_requisicao['nome']
-    if 'cargo' in dados_requisicao:
-        colaborador.cargo = dados_requisicao['cargo']
-    if 'salario' in dados_requisicao:
-        colaborador.salario = dados_requisicao['salario']
-    if 'email' in dados_requisicao:
-        colaborador.email = dados_requisicao['email']
-    if 'senha' in dados_requisicao:
-        colaborador.senha = hash_senha(dados_requisicao['senha'])
+        if 'nome' in dados_requisicao:
+            colaborador.nome = dados_requisicao['nome']
+        if 'cargo' in dados_requisicao:
+            colaborador.cargo = dados_requisicao['cargo']
+        if 'salario' in dados_requisicao:
+            colaborador.salario = dados_requisicao['salario']
+        if 'email' in dados_requisicao:
+            colaborador.email = dados_requisicao['email']
+        if 'senha' in dados_requisicao:
+            colaborador.senha = hash_senha(dados_requisicao['senha'])
 
-    db.session.commit()
+        db.session.commit()
 
-    return jsonify({'response': 'Dados do colaborador atualizados com sucesso'}), 200
+        return jsonify({'response': 'Dados do colaborador atualizados com sucesso'}), 200
+    except Exception as error:
+        return jsonify({'erro': 'Erro inesperado ao processar a requisição ', 'detalhes': str(error)}), 500
 
 @bp_colaborador.route('login', methods=['POST'])
 @swag_from('../docs/colaborador/fazer_login_colaborador.yml') # Integra a função com a documentação desse 'caminho'
 def login():
-    campos_obrigatorios = ['email', 'senha']
-    dados_requisicao = request.get_json() # Pegando o corpo da requisição enviada pelo Front
-    dados_requisicao = padronizar(dados_requisicao) # Padronizando chaves e valores do dicionario
+    try:
+        campos_obrigatorios = ['email', 'senha']
+        dados_requisicao = request.get_json() # Pegando o corpo da requisição enviada pelo Front
+        dados_requisicao = padronizar(dados_requisicao) # Padronizando chaves e valores do dicionario
 
-    erro = autenticacao_colaborador(campos_obrigatorios, dados_requisicao)
-    if erro:
-        return erro
-    
-    email = dados_requisicao['email']
-    senha = dados_requisicao['senha']
-    
-    colaborador = db.session.execute(
-        # Query fica dentro dos parametros do 'execute'
-            # (Classe Colaborador está dentro de 'model')
-        db.select(Colaborador).where(Colaborador.email == email) # Select * from colaborador Where email == 'algum_email
+        erro = autenticacao_colaborador(campos_obrigatorios, dados_requisicao)
+        if erro:
+            return erro
         
-    ).scalar() # Traz um registro ou Atribui 'none' na variável
-    
-    # Usuário não encontrado (busca feito pelo email)
-    if not colaborador:
-        return jsonify({'mensagem': 'Usuário não encontrado'}), 404
-    
-    # Se o usuário existir -> transforme ele em um dicionario
-    colaborador = colaborador.to_dict()
-    
-    # Verificar se a senha é a mesma indicada na requisição e BD
-    if checar_senha(senha, colaborador.get('senha')):
-        return jsonify({'mensagem': f"Login de ({colaborador['email']}) realizado com sucesso"}), 200 # Resposta de sucesso
-    else:
-        return jsonify({'mensagem': 'Senha incorreta'}), 401 # Resposta da senha incorreta
+        email = dados_requisicao['email']
+        senha = dados_requisicao['senha']
+        
+        colaborador = db.session.execute(
+            # Query fica dentro dos parametros do 'execute'
+                # (Classe Colaborador está dentro de 'model')
+            db.select(Colaborador).where(Colaborador.email == email) # Select * from colaborador Where email == 'algum_email
+            
+        ).scalar() # Traz um registro ou Atribui 'none' na variável
+        
+        # Usuário não encontrado (busca feito pelo email)
+        if not colaborador:
+            return jsonify({'mensagem': 'Usuário não encontrado'}), 404
+        
+        # Se o usuário existir -> transforme ele em um dicionario
+        colaborador = colaborador.to_dict()
+        
+        # Verificar se a senha é a mesma indicada na requisição e BD
+        if checar_senha(senha, colaborador.get('senha')):
+            return jsonify({'mensagem': f"Login de ({colaborador['email']}) realizado com sucesso"}), 200 # Resposta de sucesso
+        else:
+            return jsonify({'mensagem': 'Senha incorreta'}), 401 # Resposta da senha incorreta
+    except Exception as error:
+        return jsonify({'erro': 'Erro inesperado ao processar a requisição ', 'detalhes': str(error)}), 500
     
 # @bp_colaborador.route('deletar/<int:id_colaborador>', methods=['DELETE'])
 # @swag_from('../docs/colaborador/deletar_colaborador.yml') # Integra a função com a documentação desse 'caminho'

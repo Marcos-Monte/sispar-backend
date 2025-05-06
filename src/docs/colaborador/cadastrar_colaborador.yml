@@ -45,4 +45,5 @@ responses: # Possíveis respostas para as requisições
     description: Erro na requisição
   409:
     description: Conflito de dados
-
+  500:
+    description: Erro inesperado ao processar a requisição

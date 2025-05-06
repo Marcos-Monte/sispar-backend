@@ -5,4 +5,4 @@ responses:
   200:
     description: Requisição processada com sucesso
   500:
-    description: Erro interno no servidor
+    description: Erro inesperado ao processar a requisição

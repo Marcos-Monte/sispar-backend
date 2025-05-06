@@ -5,4 +5,4 @@ responses:
   200:
     description: Lista de Colaboradores
   500:
-    description: Erro interno no servidor
+    description: Erro inesperado ao processar a requisição

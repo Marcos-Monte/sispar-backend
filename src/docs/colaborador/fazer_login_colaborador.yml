@@ -27,4 +27,6 @@ responses:
     description: Usuário não encontrado
   401:
     description: Senha incorreta
+  500:
+    description: Erro inesperado ao processar a requisição
     
