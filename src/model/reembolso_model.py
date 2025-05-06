@@ -12,28 +12,28 @@ class Reembolso(db.Model):
     # Tipo de dados + Constraints (Regras)
     
     id = Column(Integer, primary_key=True, autoincrement=True) # Coluna id, tipo inteiro, chave primaria com autoincremento
-    colaborador = Column(String(150), nullable=False) # Coluna colaborador, tipo string, não pode ter valores nulos
-    empresa = Column(String(50), nullable=False) # Coluna empresa, tipo string (trabalham com abreviações)
-    num_prestacao = Column(Integer, nullable=False) # Coluna número de prestação, tipo inteiro
+    colaborador = Column(String(150), nullable=True) # Coluna colaborador, tipo string, não pode ter valores nulos
+    empresa = Column(String(50), nullable=True) # Coluna empresa, tipo string (trabalham com abreviações)
+    num_prestacao = Column(Integer, nullable=True) # Coluna número de prestação, tipo inteiro
     # Ícone
     descricao = Column(String(255)) # Seria a imagem dos tickets de comprovação (poderiamos armazenar imagens e chamar URL ou usar alguma técnica)
     # No caso de tratar no front, pode gerar erro!
-    data = Column(DATE, default=func.current_date(), nullable=False) # Coluna data, tipo data, (Se não tiver data, pegar a data do dia)
+    data = Column(DATE, default=func.current_date(), nullable=True) # Coluna data, tipo data, (Se não tiver data, pegar a data do dia)
     # Enumarate (tecnica para lidar com outros Selects)
-    tipo_reembolso = Column(String(35), nullable=False) # Coluna tipo, tipo string (virá de um select no front)
-    centro_custo = Column(String(50), nullable=False) # Coluna centro de custo, tipo string (virá de um select no front)
+    tipo_reembolso = Column(String(35), nullable=True) # Coluna tipo, tipo string (virá de um select no front)
+    centro_custo = Column(String(50), nullable=True) # Coluna centro de custo, tipo string (virá de um select no front)
     
     # pep = ordem + divisão -> Fazer regra de negocio para que isso fique disponível no Front
     ordem_interna = Column(String(50)) 
     divisao = Column(String(50)) 
     pep = Column(String(50)) 
     
-    moeda = Column(String(20), nullable=False) # Coluna moeda, tipo string (virá de um select no front)
+    moeda = Column(String(20), nullable=True) # Coluna moeda, tipo string (virá de um select no front)
     
     # Função que recebe distancia e indica o valor por km percorrido no valor_faturado (10 x 1 = 10)
     distancia_km = Column(String((50)))
     valor_km = Column(String((50)))
-    valor_faturado = Column(DECIMAL(10, 2), nullable=False) # Colocando 10 casas antes da virgula e 2 depois
+    valor_faturado = Column(DECIMAL(10, 2), nullable=True) # Colocando 10 casas antes da virgula e 2 depois
     
     despesa = Column(DECIMAL(10, 2)) # Colocando 10 casas antes da virgula e 2 depois (Adiantamento pode existir ou não)
     
