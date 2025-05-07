@@ -12,13 +12,13 @@ class Colaborador(db.Model): # db.Model -> Mapear e criar a tabela
     
     nome = Column(String(255))
     email = Column(String(155))
-    senha = Column(String(50))
-    cargo = Column(String(50))
-    salario = Column(DECIMAL(2))
+    senha = Column(String(150))
+    cargo = Column(String(150))
+    salario = Column(DECIMAL(10,2))
     
     # Método __init__ é um método construtor
     def __init__ (self, nome, email, senha, cargo, salario):
-        self.nome = nome
+        self.nome = nome 
         self.email = email
         self.senha = senha
         self.cargo = cargo
