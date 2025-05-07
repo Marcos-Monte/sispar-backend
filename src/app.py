@@ -28,7 +28,7 @@ swagger_config = {
 def create_app():
     app = Flask(__name__)  # <-- carrega a instancia do Flask
     
-    CORS(app, origins='*' ) # A politica de CORS seja implementada em TODA a aplicação (todas as rotas vão aceitar requisições dos endereços indicados) # Lista de origens (asterico libera qualquer requisição)
+    CORS(app, origins=['http://localhost:5173'] ) # A politica de CORS seja implementada em TODA a aplicação (todas as rotas vão aceitar requisições dos endereços indicados) # Lista de origens (asterico libera qualquer requisição)
     
     app.register_blueprint(bp_colaborador) # Registra o blueprint -> colaborador
     app.register_blueprint(bp_reembolso) # Registra o blueprint -> reembolso
