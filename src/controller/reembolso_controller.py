@@ -51,21 +51,28 @@ def solicitar_novo_reembolso():
     
         # Validações
         if not lista_solicitacao:
-            return jsonify({'error': 'Necessário enviar dados na solicitação!'}), 400
+            return jsonify({'erro': 'A lista de solicitações está vazia. Envie pelo menos um reembolso.'}), 400
+        objetos_solicitacao = []
         # Percorrer a lista recebida e criar um objeto para cada item da lista
-        for dados_solicitacao in lista_solicitacao:
+        for i, dados_solicitacao in enumerate(lista_solicitacao):
             pep = dados_solicitacao.get('pep')
             divisao = dados_solicitacao.get('divisao')
             ordem_interna = dados_solicitacao.get('ordem_interna')
             
             if pep and not (ordem_interna and divisao):
-                ordem_interna, divisao = pep.split('-', 1)
+                if '-' in pep:
+                    ordem_interna, divisao = pep.split('-', 1)
+                else:
+                    return jsonify({'erro': f'{i+1}º Solicitação inválida: o campo pep deve conter "-" para separar ordem_interna e divisão.'}), 400
             elif (ordem_interna and divisao) and not pep:
                 pep = f'{ordem_interna}-{divisao}'
             elif pep and (ordem_interna and divisao):
-                ordem_interna, divisao = pep.split('-', 1)
+                if '-' in pep:
+                    ordem_interna, divisao = pep.split('-', 1)
+                else:
+                    return jsonify({'erro': f'{i+1}º Solicitação inválida: o campo pep deve conter "-" para separar ordem_interna e divisão.'}), 400
             elif not pep and not (ordem_interna and divisao):
-                return jsonify({'erro': 'Informe "pep" ou "ordem_interna e divisao."'}), 400
+                return jsonify({'erro': f'{i+1}º Solicitação inválida: Informe "pep" ou "ordem_interna e divisao."'}), 400
             
             # Criando o objeto a ser inserido no bd
             nova_solicitacao = Reembolso(
@@ -87,12 +94,14 @@ def solicitar_novo_reembolso():
                 id_colaborador = dados_solicitacao['id_colaborador'],
                 status = 'analisando',
             )
-            db.session.add(nova_solicitacao)
-            db.session.commit()
+            objetos_solicitacao.append(nova_solicitacao)
+            
+        db.session.add(nova_solicitacao)
+        db.session.commit()
         return jsonify({'response': 'Solicitação feita com sucesso'}), 201
     
-    except Exception as error:
-        return jsonify({'erro': 'Erro inesperado ao processar a requisição ', 'detalhes': str(error)}), 500
+    except Exception as erro:
+        return jsonify({'erro': 'Erro inesperado ao processar a requisição ', 'detalhes': str(erro)}), 500
 
 @bp_reembolso.route('<int:id>')
 def buscar_por_id_colaborador(id):

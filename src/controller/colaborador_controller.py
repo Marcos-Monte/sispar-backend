@@ -144,7 +144,7 @@ def login():
         
         # Verificar se a senha é a mesma indicada na requisição e BD
         if checar_senha(senha, colaborador.get('senha')):
-            return jsonify({'mensagem': f"Login de ({colaborador['email']}) realizado com sucesso"}), 200 # Resposta de sucesso
+            return jsonify({'mensagem': f"Login de ({colaborador['email']}) realizado com sucesso", "items": colaborador}), 200 # Resposta de sucesso
         else:
             return jsonify({'mensagem': 'Senha incorreta'}), 401 # Resposta da senha incorreta
     except Exception as error:
