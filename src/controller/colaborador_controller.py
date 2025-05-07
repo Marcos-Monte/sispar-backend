@@ -105,7 +105,7 @@ def atualizar_dados_colaborador(id_colaborador):
         if 'email' in dados_requisicao:
             colaborador.email = dados_requisicao['email']
         if 'senha' in dados_requisicao:
-            colaborador.senha = hash_senha(dados_requisicao['senha'])
+            colaborador.senha = hash_senha(dados_requisicao['senha']).decode('utf-8')
 
         db.session.commit()
 
