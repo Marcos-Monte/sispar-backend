@@ -7,13 +7,16 @@ from dotenv import load_dotenv
 # Carrega as variáveis de ambiente do arquivo .env para serem acessíveis via 'environ'
 load_dotenv()
 
-# Exibe no terminal a URI do banco de dados que foi carregada das variáveis de ambiente
-print("URI do banco:", environ.get('URL_DATABASE_PROD'))
-
 # Classe de configuração principal da aplicação
 class Config:
-    # Define a URI do banco de dados que será usada pela extensão SQLAlchemy
-    SQLALCHEMY_DATABASE_URI = environ.get('URL_DATABASE_PROD')
+    ENV = environ.get("FLASK_ENV", "development")
     
+    if ENV == 'production':
+        # Em produção, usa a variável que está configurada diretamente no Render
+        SQLALCHEMY_DATABASE_URI = environ.get('URL_DATABASE_PROD')
+    else: 
+        # Em desenvolvimento, usa a variável do .env local
+        SQLALCHEMY_DATABASE_URI = environ.get("URL_DATABASE_DEV")
+        
     # Desativa a funcionalidade de rastreamento de modificações de objetos para economizar memória
     SQLALCHEMY_TRACK_MODIFICATIONS = False
