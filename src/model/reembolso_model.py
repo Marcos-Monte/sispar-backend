@@ -10,11 +10,10 @@ class Reembolso(db.Model):
     __tablename__ = 'tb_reembolso' # Cria a tabela com o nome tb_colaborador
 #-------------------------- Atributos ------------------------------------
     # Tipo de dados + Constraints (Regras)
-    
-    id = Column(Integer, primary_key=True, autoincrement=True) # Coluna id, tipo inteiro, chave primaria com autoincremento
+    # id = Column(Integer, primary_key=True, autoincrement=True) # Coluna id, tipo inteiro, chave primaria com autoincremento
+    num_prestacao = Column(Integer, primary_key=True, autoincrement=True) # Coluna número de prestação, tipo inteiro
     colaborador = Column(String(150), nullable=False) # Coluna colaborador, tipo string, não pode ter valores nulos
     empresa = Column(String(50), nullable=False) # Coluna empresa, tipo string (trabalham com abreviações)
-    num_prestacao = Column(Integer, nullable=False) # Coluna número de prestação, tipo inteiro
     # Ícone
     descricao = Column(String(255)) # Seria a imagem dos tickets de comprovação (poderiamos armazenar imagens e chamar URL ou usar alguma técnica)
     # No caso de tratar no front, pode gerar erro!
@@ -43,11 +42,11 @@ class Reembolso(db.Model):
     
 # ----------------------------------------------------------------------------
     # Método contrutor -> Necessário o atributo 'self'
-    def __init__ (self, colaborador, empresa, num_prestacao, descricao, data, tipo_reembolso, centro_custo, ordem_interna, divisao, pep, moeda, distancia_km, valor_km, valor_faturado, despesa, id_colaborador, status='analisando'):
+    def __init__ (self, colaborador, empresa, descricao, data, tipo_reembolso, centro_custo, ordem_interna, divisao, pep, moeda, distancia_km, valor_km, valor_faturado, despesa, id_colaborador, status='analisando'):
         # self.id = id # Quando o ID é autoincrementado, não precisa estar no Método Construtor
         self.colaborador = colaborador
         self.empresa = empresa
-        self.num_prestacao = num_prestacao
+        # self.num_prestacao = num_prestacao
         self.descricao = descricao
         self.data = data
         self.tipo_reembolso = tipo_reembolso
@@ -66,7 +65,7 @@ class Reembolso(db.Model):
 # --------------------Métodos ---------------------------------------------------
     def all_data(self) -> dict:
         return {
-            'id': self.id,
+            # 'id': self.id,
             'colaborador': self.colaborador,
             'empresa': self.empresa,
             'num_prestacao': self.num_prestacao,

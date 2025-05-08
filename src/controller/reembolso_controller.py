@@ -78,7 +78,7 @@ def solicitar_novo_reembolso():
             nova_solicitacao = Reembolso(
                 colaborador = dados_solicitacao['colaborador'],
                 empresa = dados_solicitacao['empresa'],
-                num_prestacao = dados_solicitacao['num_prestacao'],
+                # num_prestacao = dados_solicitacao['num_prestacao'],
                 descricao = dados_solicitacao['descricao'],
                 data = dados_solicitacao['data'],
                 tipo_reembolso = dados_solicitacao['tipo_reembolso'],
@@ -108,11 +108,11 @@ def buscar_por_id_colaborador(id):
     
     try:
         reembolsos = db.session.execute(
-            db.select(Reembolso).where(Reembolso.id_colaborador == id)
+            db.select(Reembolso).where(Reembolso.num_prestacao == id)
         ).scalars().all()
         
         if not reembolsos:
-            return jsonify({'error': 'Não há reembolsos desse ID de Colaborador'}), 404
+            return jsonify({'error': 'Não solicitação de reembolso com este nº de prestação de contas.'}), 404
         
         reembolsos = [ reembolso.all_data() for reembolso in reembolsos ]
         
