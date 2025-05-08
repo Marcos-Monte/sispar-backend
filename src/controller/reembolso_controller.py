@@ -21,6 +21,8 @@ from flask import Blueprint, request, jsonify
 from src.model.reembolso_model import Reembolso
 from src.model import db # Retirado do __ini__ da pasta Model
 
+from src.services.utils import padronizar
+
 from flasgger import swag_from # Classe que faz a documentação em yml
 
 bp_reembolso = Blueprint('reembolso', __name__, url_prefix='/reembolso')# https://localhost:8000/reembolsos
@@ -103,12 +105,12 @@ def solicitar_novo_reembolso():
     except Exception as erro:
         return jsonify({'erro': 'Erro inesperado ao processar a requisição ', 'detalhes': str(erro)}), 500
 
-@bp_reembolso.route('<int:id>')
-def buscar_por_id_colaborador(id):
+@bp_reembolso.route('<int:num_prestacao>')
+def buscar_por_num_prestacao_colaborador(num_prestacao):
     
     try:
         reembolsos = db.session.execute(
-            db.select(Reembolso).where(Reembolso.num_prestacao == id)
+            db.select(Reembolso).where(Reembolso.num_prestacao == num_prestacao)
         ).scalars().all()
         
         if not reembolsos:
@@ -120,11 +122,11 @@ def buscar_por_id_colaborador(id):
     except Exception as error:
         return jsonify({'error': 'Erro inesperado ao processar a requisição ', 'detalhes': str(error)}), 500
 
-@bp_reembolso.route('deletar/<int:id>', methods=['DELETE'])
-def deletar_por_id(id):
+@bp_reembolso.route('deletar/<int:num_prestacao>', methods=['DELETE'])
+def deletar_por_num_prestacao(num_prestacao):
     try:
         reembolso = db.session.execute(
-            db.select(Reembolso).where(Reembolso.id == id)
+            db.select(Reembolso).where(Reembolso.num_prestacao == num_prestacao)
         ).scalar()
         if not reembolso:
             return jsonify({'erro': 'Reembolso não encontrado'}), 404
@@ -132,6 +134,55 @@ def deletar_por_id(id):
         db.session.delete(reembolso)
         db.session.commit()
 
-        return jsonify({'mensagem': f'Reembolso {id} deletado com sucesso'}), 200
+        return jsonify({'mensagem': f'Reembolso {num_prestacao} deletado com sucesso'}), 200
     except Exception as error:
         return jsonify({'erro': 'Erro inesperado ao processar a requisição', 'detalhes': str(error)}), 500
+    
+@bp_reembolso.route('/atualizar/<int:num_prestacao>', methods=['PUT'])
+def atualizar_reembolso(num_prestacao):
+    try:
+        dados_reembolso = request.get_json()
+        dados_reembolso = padronizar(dados_reembolso)
+        
+        reembolso = db.session.get(Reembolso, num_prestacao) # Buscando o colaborador pelo id 
+        
+        if not reembolso:
+            return jsonify({'response': 'Nº de prestação de conta não identificado.'}), 404
+            
+        if 'colaborador' in dados_reembolso:
+            reembolso.colaborador = dados_reembolso['colaborador']
+        if 'empresa' in dados_reembolso:
+            reembolso.empresa = dados_reembolso['empresa']
+        if 'descricao' in dados_reembolso:
+            reembolso.descricao = dados_reembolso['descricao']
+        if 'data' in dados_reembolso:
+            reembolso.data = dados_reembolso['data']
+        if 'tipo_reembolso' in dados_reembolso:
+            reembolso.tipo_reembolso = dados_reembolso['tipo_reembolso']
+        if 'centro_custo' in dados_reembolso:
+            reembolso.centro_custo = dados_reembolso['centro_custo']
+        if 'ordem_interna' in dados_reembolso:
+            reembolso.ordem_interna = dados_reembolso['ordem_interna']
+        if 'divisao' in dados_reembolso:
+            reembolso.divisao = dados_reembolso['divisao']
+        if 'pep' in dados_reembolso:
+            reembolso.pep = dados_reembolso['pep']
+        if 'moeda' in dados_reembolso:
+            reembolso.moeda = dados_reembolso['moeda']
+        if 'distancia_km' in dados_reembolso:
+            reembolso.distancia_km = dados_reembolso['distancia_km']
+        if 'valor_km' in dados_reembolso:
+            reembolso.valor_km = dados_reembolso['valor_km']
+        if 'valor_faturado' in dados_reembolso:
+            reembolso.valor_faturado = dados_reembolso['valor_faturado']
+        if 'despesa' in dados_reembolso:
+            reembolso.despesa = dados_reembolso['despesa']
+        if 'status' in dados_reembolso:
+            reembolso.status = dados_reembolso['status']
+            
+        db.session.commit()
+        
+        return jsonify({'response': 'Reembolso atualizado com sucesso'}), 200
+        
+    except Exception as error:
+        return jsonify({'erro': 'Erro inesperado ao processar a requisição ', 'detalhes': str(error)}), 500
