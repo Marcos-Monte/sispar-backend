@@ -96,7 +96,7 @@ def solicitar_novo_reembolso():
             )
             objetos_solicitacao.append(nova_solicitacao)
             
-        db.session.add(nova_solicitacao)
+        db.session.add_all(objetos_solicitacao)
         db.session.commit()
         return jsonify({'response': 'Solicitação feita com sucesso'}), 201
     
