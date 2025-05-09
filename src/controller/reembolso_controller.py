@@ -106,7 +106,8 @@ def solicitar_novo_reembolso():
         return jsonify({'erro': 'Erro inesperado ao processar a requisição ', 'detalhes': str(erro)}), 500
 
 @bp_reembolso.route('<int:num_prestacao>')
-def buscar_por_num_prestacao_colaborador(num_prestacao):
+@swag_from('../docs/reembolso/buscar_solicitacao.yml')
+def buscar__reembolso_por_num_prestacao(num_prestacao):
     
     try:
         reembolsos = db.session.execute(
@@ -123,22 +124,24 @@ def buscar_por_num_prestacao_colaborador(num_prestacao):
         return jsonify({'error': 'Erro inesperado ao processar a requisição ', 'detalhes': str(error)}), 500
 
 @bp_reembolso.route('deletar/<int:num_prestacao>', methods=['DELETE'])
+@swag_from('../docs/reembolso/deletar_solicitacao.yml')
 def deletar_por_num_prestacao(num_prestacao):
     try:
         reembolso = db.session.execute(
             db.select(Reembolso).where(Reembolso.num_prestacao == num_prestacao)
         ).scalar()
         if not reembolso:
-            return jsonify({'erro': 'Reembolso não encontrado'}), 404
+            return jsonify({'erro': 'Solicitação de reembolso não encontrada.'}), 404
 
         db.session.delete(reembolso)
         db.session.commit()
 
-        return jsonify({'mensagem': f'Reembolso {num_prestacao} deletado com sucesso'}), 200
+        return jsonify({'mensagem': f'Reembolso {num_prestacao} deletado com sucesso.'}), 200
     except Exception as error:
-        return jsonify({'erro': 'Erro inesperado ao processar a requisição', 'detalhes': str(error)}), 500
+        return jsonify({'erro': 'Erro inesperado ao processar a requisição.', 'detalhes': str(error)}), 500
     
 @bp_reembolso.route('/atualizar/<int:num_prestacao>', methods=['PUT'])
+@swag_from('../docs/reembolso/atualizar_solicitacao.yml')
 def atualizar_reembolso(num_prestacao):
     try:
         dados_reembolso = request.get_json()
@@ -182,7 +185,7 @@ def atualizar_reembolso(num_prestacao):
             
         db.session.commit()
         
-        return jsonify({'response': 'Reembolso atualizado com sucesso'}), 200
+        return jsonify({'response': 'Solicitação de reembolso atualizado com sucesso.'}), 200
         
     except Exception as error:
         return jsonify({'erro': 'Erro inesperado ao processar a requisição ', 'detalhes': str(error)}), 500

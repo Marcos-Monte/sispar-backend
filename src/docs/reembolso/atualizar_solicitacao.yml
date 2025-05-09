@@ -1,0 +1,79 @@
+tags:
+  - Reembolso
+description: Atualizar os dados de uma solicitação de reembolso existente
+
+parameters:
+  - in: path
+    name: num_prestacao
+    required: true
+    schema:
+      type: number
+    description: Número da prestação de contas da solicitação buscada ser atualizado
+
+  - in: body
+    name: corpo
+    required: true
+
+    schema:
+      type: object
+      properties:
+        colaborador:
+          type: string
+          example: marcos monte
+        empresa:
+          type: string
+          example: vai na web company
+        descricao:
+          type: string
+          example: Comprovante de abastecimento em posto de gasolina
+        data:
+          type: date
+          example: 2025/05/05
+        tipo_reembolso:
+          type: string
+          example: gasolina
+        centro_custo:
+          type: string
+          example: 1100109002 - FIN CONTROLES INTERNOS MTZ
+        ordem_interna: 
+          type: string
+          example: "123"
+          description: Código de ordem interna será substituído se 'pep' for informado
+        divisao:
+          type: string
+          example: "456"
+          description: Código de divisao será substituído se 'pep' for informado
+        pep:
+          type: string
+          example: "123-456"
+          description: Código PEP completo (opcional se 'ordem_interna' e 'divisao' forem informados)
+        moeda:
+          type: string
+          example: BRL
+        distancia_km:
+          type: string
+          example: "100.10"
+        valor_km:
+          type: string
+          example: "2"
+        valor_faturado:
+          type: number
+          example: 200.20
+        despesa:
+          type: number
+          example: 150.50
+          description: Valor pago em adiantamento (se existir)
+        id_colaborador:
+          type: number
+          example: 1
+        status:
+          type: string
+          example: analisando
+
+responses:
+  200:
+    description: Solicitação de reembolso atualizado com sucesso.
+  404:
+    description: Nº de prestação de conta não identificado.
+  500:
+    description: Erro inesperado ao processar a requisição

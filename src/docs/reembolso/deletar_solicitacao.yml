@@ -1,0 +1,19 @@
+tags:
+  - Reembolso
+description: Deletar uma solicitação de reembolso existente
+
+parameters:
+  - in: path
+    name: num_prestacao
+    required: true
+    schema:
+      type: number
+    description: Número da prestação de contas da solicitação buscada
+
+responses:
+  200:
+    description: Reembolso (num_prestacao) deletado com sucesso
+  404:
+    description: Solicitação de reembolso não encontrada.
+  500:
+    description: Erro inesperado ao processar a requisição.

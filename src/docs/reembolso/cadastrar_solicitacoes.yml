@@ -17,9 +17,6 @@ parameters:
           empresa:
             type: string
             example: vai na web company
-          num_prestacao:
-            type: number
-            example: 1
           descricao:
             type: string
             example: Comprovante de abastecimento em posto de gasolina
@@ -70,7 +67,6 @@ parameters:
         required:
           - colaborador
           - empresa
-          - num_prestacao
           - data
           - tipo_reembolso
           - centro_custo

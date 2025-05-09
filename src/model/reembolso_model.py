@@ -46,7 +46,7 @@ class Reembolso(db.Model):
         # self.id = id # Quando o ID é autoincrementado, não precisa estar no Método Construtor
         self.colaborador = colaborador
         self.empresa = empresa
-        # self.num_prestacao = num_prestacao
+        # self.num_prestacao = num_prestacao # Quando se é autoincrementado, não precisa estar no Método Construtor
         self.descricao = descricao
         self.data = data
         self.tipo_reembolso = tipo_reembolso
@@ -65,7 +65,6 @@ class Reembolso(db.Model):
 # --------------------Métodos ---------------------------------------------------
     def all_data(self) -> dict:
         return {
-            # 'id': self.id,
             'colaborador': self.colaborador,
             'empresa': self.empresa,
             'num_prestacao': self.num_prestacao,
