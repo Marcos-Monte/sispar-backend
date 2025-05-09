@@ -29,6 +29,9 @@ parameters:
         cargo:
           type: string
           example: qa
+        status:
+          type: string
+          example: inativo
         salario:
           type: number
           example: 3500.50

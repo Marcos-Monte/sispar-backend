@@ -48,7 +48,7 @@ def pegar_dados_todos_colaboradores():
 @swag_from('../docs/colaborador/cadastrar_colaborador.yml') # Integra a função com a documentação desse 'caminho'
 def cadastrar_novo_coladorador():
     try:
-        campos_obrigatorios = ['nome', 'email', 'senha', 'cargo', 'salario']
+        campos_obrigatorios = ['nome', 'email', 'senha', 'cargo', 'salario', 'status']
         dados_requisicao = request.get_json() # Pegando o corpo da requisição enviada pelo Front
         dados_requisicao = padronizar(dados_requisicao) # Padronizando chaves e valores do dicionario
         
@@ -63,7 +63,8 @@ def cadastrar_novo_coladorador():
             email=dados_requisicao['email'],
             senha=hash_senha(dados_requisicao['senha']), # Criptografando a senha
             cargo=dados_requisicao['cargo'],
-            salario=dados_requisicao['salario']
+            salario=dados_requisicao['salario'],
+            status=dados_requisicao['status']
         )
         
         # INSERT INTO tb_colaborador (nome, email, senha cargo, salario) 
@@ -104,6 +105,8 @@ def atualizar_dados_colaborador(id_colaborador):
             colaborador.cargo = dados_requisicao['cargo']
         if 'salario' in dados_requisicao:
             colaborador.salario = dados_requisicao['salario']
+        if 'status' in dados_requisicao:
+            colaborador.status = dados_requisicao['status']
         if 'email' in dados_requisicao:
             colaborador.email = dados_requisicao['email']
         if 'senha' in dados_requisicao:

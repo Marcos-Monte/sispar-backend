@@ -15,14 +15,16 @@ class Colaborador(db.Model): # db.Model -> Mapear e criar a tabela
     senha = Column(String(150))
     cargo = Column(String(150))
     salario = Column(DECIMAL(10,2))
+    status = Column(String(100))
     
     # Método __init__ é um método construtor
-    def __init__ (self, nome, email, senha, cargo, salario):
+    def __init__ (self, nome, email, senha, cargo, salario, status):
         self.nome = nome 
         self.email = email
         self.senha = senha
         self.cargo = cargo
         self.salario = salario
+        self.status = status
         
 # -------------------------------------------------------------------------------------------------
     # Formata o tipo de dados que serão enviados ao FrontEnd
@@ -32,7 +34,6 @@ class Colaborador(db.Model): # db.Model -> Mapear e criar a tabela
             'nome': self.nome,
             'email': self.email,
             'senha': self.senha,
-            'salario': self.salario,
             'cargo': self.cargo,
         }
         
@@ -42,8 +43,9 @@ class Colaborador(db.Model): # db.Model -> Mapear e criar a tabela
         return {
             'id': self.id,
             'nome': self.nome,
-            'cargo': self.cargo,
-            'salario': self.salario,
             'email': self.email,
             'senha': self.senha,
+            'cargo': self.cargo,
+            'salario': self.salario,
+            'status': self.status,
         }

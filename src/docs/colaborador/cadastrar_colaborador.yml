@@ -27,6 +27,9 @@ parameters:
         cargo:
           type: string
           example: qa
+        status:
+          type: string
+          example: inativo
         salario:
           type: number # Pega qualquer tipo de números (inteiros ou Reais)
           example: 3500.50
@@ -37,6 +40,7 @@ parameters:
         - senha
         - cargo
         - salario
+        - status
 
 responses: # Possíveis respostas para as requisições
   201:
