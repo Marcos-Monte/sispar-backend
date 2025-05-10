@@ -85,11 +85,16 @@ def cadastrar_novo_coladorador():
         if erro:
             return erro
         
+        senha_pura = dados_requisicao['senha']
+        if isinstance(senha_pura, bytes):
+            senha_pura = senha_pura.decode('utf-8')
+        senha_hash = hash_senha(senha_pura).decode('utf-8')
+        
         # Criando novo dicionário nos moldes da classe 'Colaborador'
         novo_colaborador = Colaborador(
             nome=dados_requisicao['nome'],
             email=dados_requisicao['email'],
-            senha=hash_senha(dados_requisicao['senha']), # Criptografando a senha
+            senha=senha_hash, # Criptografando a senha
             cargo=dados_requisicao['cargo'],
             salario=dados_requisicao['salario'],
             status=dados_requisicao['status'],
@@ -139,7 +144,10 @@ def atualizar_dados_colaborador(id_colaborador):
         if 'email' in dados_requisicao:
             colaborador.email = dados_requisicao['email']
         if 'senha' in dados_requisicao:
-            colaborador.senha = hash_senha(dados_requisicao['senha']).decode('utf-8')
+            senha = dados_requisicao['senha']
+            if isinstance(senha, bytes):
+                senha = senha.decode('utf-8')
+            colaborador.senha = hash_senha(senha).decode('utf-8')
         if 'foto' in dados_requisicao:
             colaborador.foto = dados_requisicao['foto']
 
