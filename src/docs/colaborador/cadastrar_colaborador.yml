@@ -33,6 +33,9 @@ parameters:
         salario:
           type: number # Pega qualquer tipo de números (inteiros ou Reais)
           example: 3500.50
+        foto:
+          type: file # Pega qualquer tipo de números (inteiros ou Reais)
+          example: 
 
       required: # Quais props serão obrigatorios
         - nome

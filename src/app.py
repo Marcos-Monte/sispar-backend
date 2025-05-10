@@ -10,6 +10,8 @@ from flask_cors import CORS # Importa a classe do CORS -> Configuração sempre 
 
 from flasgger import Swagger # Importando a classe Swagger
 
+import os # Interação com o sistema operacional. Manipulação de diretórios, arquivos, processos e outros
+
 swagger_config = {
     "headers": [], # Questões de autorizações serão indicadas aqui ->  Não temos configurações de autorização por isso a lista vazia
     "specs": [ # Especificações da documentação
@@ -26,7 +28,11 @@ swagger_config = {
 }
 
 def create_app():
-    app = Flask(__name__)  # <-- carrega a instancia do Flask
+    # app = Flask(__name__)  # <-- carrega a instancia do Flask
+    app = Flask(
+        __name__,
+        static_folder=os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static')) # Indica o caminho da pasta 'static' para o Flask
+    )
     
     CORS(app, origins=['http://localhost:5173', 'https://sispar-iota.vercel.app'] ) # A politica de CORS seja implementada em TODA a aplicação (todas as rotas vão aceitar requisições dos endereços indicados) # Lista de origens (asterico libera qualquer requisição)
     
