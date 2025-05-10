@@ -1,0 +1,19 @@
+tags:
+  - Reembolso
+description: Retornar uma solicitação de reembolso passando o número de prestação como parametro
+
+parameters:
+  - in: path
+    name: num_prestacao
+    required: true
+    schema:
+      type: number
+    description: Número da prestação de contas da solicitação buscada
+
+responses:
+  200:
+    description: Requisição processada com sucesso
+  404:
+    description: Não solicitação de reembolso com este nº de prestação de contas.
+  500:
+    description: Erro inesperado ao processar a requisição.

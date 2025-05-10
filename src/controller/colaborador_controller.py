@@ -14,11 +14,41 @@ from src.services.utils import padronizar, validacao_cadastro_completa, validaca
 
 from flasgger import swag_from # Classe que faz a documentação em yml
 
+from sqlalchemy.exc import IntegrityError
+
+import os # Interação com o sistema operacional. Manipulação de diretórios, arquivos, processos e outros
+import uuid # Criar ID único
+from werkzeug.utils import secure_filename # Lib para fazer upload de imagem do colaborador
+# UPLOAD_FOLDER = 'static/uploads'  # pasta onde as imagens serão salvas
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+UPLOAD_FOLDER = os.path.join(BASE_DIR, '..', '..', 'static', 'uploads') # 'Controi' o caminho para o diretório 'uploads' dentro da estrutura de pastas
+# Certifique-se de que essa pasta existe:
+os.makedirs(UPLOAD_FOLDER, exist_ok=True) #  Se o Diretório Existir retornar ok
+
 # Anteriormente usava se uma lista de dicionario com dados como banco de dados Mockado
 
 # Blueprint -> Conceito de dividir as rotas 
 # Usar o nome do arquivo, recebe a Classe 'Blueprint'
 bp_colaborador = Blueprint('colaborador', __name__, url_prefix='/colaborador') # https://localhost:8000/colaborador
+
+@bp_colaborador.route('/upload-foto', methods=['POST'])
+def upload_foto():
+    if 'foto' not in request.files:
+        return jsonify({'erro': 'Nenhum arquivo enviado'}), 400
+    
+    file = request.files['foto']
+    
+    if file.filename == '':
+        return jsonify({'erro': 'Nome de arquivo inválido'}), 400
+    
+    # Por isso:
+    extensao = os.path.splitext(file.filename)[1]
+    filename = f"{uuid.uuid4().hex}{extensao}"
+    caminho_completo = os.path.join(UPLOAD_FOLDER, filename)
+    file.save(caminho_completo)
+    
+    url_imagem = f"/static/uploads/{filename}"
+    return jsonify({'response': 'Upload feito com sucesso', 'url': url_imagem})
 
 @bp_colaborador.route('/todos-colaboradores')
 @swag_from('../docs/colaborador/listar_colaboradores.yml') # Integra a função com a documentação desse 'caminho'
@@ -46,7 +76,7 @@ def pegar_dados_todos_colaboradores():
 @swag_from('../docs/colaborador/cadastrar_colaborador.yml') # Integra a função com a documentação desse 'caminho'
 def cadastrar_novo_coladorador():
     try:
-        campos_obrigatorios = ['nome', 'email', 'senha', 'cargo', 'salario']
+        campos_obrigatorios = ['nome', 'email', 'senha', 'cargo', 'salario', 'status']
         dados_requisicao = request.get_json() # Pegando o corpo da requisição enviada pelo Front
         dados_requisicao = padronizar(dados_requisicao) # Padronizando chaves e valores do dicionario
         
@@ -61,7 +91,9 @@ def cadastrar_novo_coladorador():
             email=dados_requisicao['email'],
             senha=hash_senha(dados_requisicao['senha']), # Criptografando a senha
             cargo=dados_requisicao['cargo'],
-            salario=dados_requisicao['salario']
+            salario=dados_requisicao['salario'],
+            status=dados_requisicao['status'],
+            foto=dados_requisicao.get('foto')  # opcional 
         )
         
         # INSERT INTO tb_colaborador (nome, email, senha cargo, salario) 
@@ -102,10 +134,14 @@ def atualizar_dados_colaborador(id_colaborador):
             colaborador.cargo = dados_requisicao['cargo']
         if 'salario' in dados_requisicao:
             colaborador.salario = dados_requisicao['salario']
+        if 'status' in dados_requisicao:
+            colaborador.status = dados_requisicao['status']
         if 'email' in dados_requisicao:
             colaborador.email = dados_requisicao['email']
         if 'senha' in dados_requisicao:
             colaborador.senha = hash_senha(dados_requisicao['senha']).decode('utf-8')
+        if 'foto' in dados_requisicao:
+            colaborador.foto = dados_requisicao['foto']
 
         db.session.commit()
 
@@ -150,20 +186,20 @@ def login():
     except Exception as error:
         return jsonify({'erro': 'Erro inesperado ao processar a requisição ', 'detalhes': str(error)}), 500
     
-# @bp_colaborador.route('deletar/<int:id_colaborador>', methods=['DELETE'])
-# @swag_from('../docs/colaborador/deletar_colaborador.yml') # Integra a função com a documentação desse 'caminho'
-# def deletar_por_id(id_colaborador):
-#     colaborador = db.session.get(Colaborador, id_colaborador) # Buscando o colaborador pelo id 
+@bp_colaborador.route('deletar/<int:id_colaborador>', methods=['DELETE'])
+@swag_from('../docs/colaborador/deletar_colaborador.yml') # Integra a função com a documentação desse 'caminho'
+def deletar_por_id(id_colaborador):
+    colaborador = db.session.get(Colaborador, id_colaborador) # Buscando o colaborador pelo id 
     
-#     # Erro para caso o id_colaborador não exista no banco de dados
-#     if not colaborador:
-#         return jsonify({'erro': 'Colaborador não encontrado'}), 404
+    # Erro para caso o id_colaborador não exista no banco de dados
+    if not colaborador:
+        return jsonify({'erro': 'Colaborador não encontrado'}), 404
 
-#     try:
-#         db.session.delete(colaborador) # Deletando o colaborador encontrado
-#         db.session.commit() # executando a ação
-#         return jsonify({'mensagem': f'Colaborador {colaborador.email} deletado com sucesso'}), 200
+    try:
+        db.session.delete(colaborador) # Deletando o colaborador encontrado
+        db.session.commit() # executando a ação
+        return jsonify({'mensagem': f'Colaborador {colaborador.email} deletado com sucesso'}), 200
     
-#     except IntegrityError:
-#         db.session.rollback()
-#         return jsonify({'erro': f'Não é possível excluir o colaborador ({colaborador.email}), pois há registros relacionados'}), 400
+    except IntegrityError:
+        db.session.rollback()
+        return jsonify({'erro': f'Não é possível excluir o colaborador ({colaborador.email}), pois há registros relacionados'}), 400

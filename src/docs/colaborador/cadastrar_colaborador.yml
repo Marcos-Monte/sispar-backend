@@ -27,9 +27,15 @@ parameters:
         cargo:
           type: string
           example: qa
+        status:
+          type: string
+          example: inativo
         salario:
           type: number # Pega qualquer tipo de números (inteiros ou Reais)
           example: 3500.50
+        foto:
+          type: file # Pega qualquer tipo de números (inteiros ou Reais)
+          example: 
 
       required: # Quais props serão obrigatorios
         - nome
@@ -37,6 +43,7 @@ parameters:
         - senha
         - cargo
         - salario
+        - status
 
 responses: # Possíveis respostas para as requisições
   201:

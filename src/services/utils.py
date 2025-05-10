@@ -92,7 +92,6 @@ def validacao_atualização_colaborador(dados):
     if email_invalido:
         return email_invalido
         
-        
     return None # Tudo Valido
 
 # Verificação para fazer o login de colaborador
