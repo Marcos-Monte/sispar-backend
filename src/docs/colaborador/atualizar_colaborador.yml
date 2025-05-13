@@ -4,11 +4,11 @@ description: Atualizar os dados de um colaborador existente
 
 parameters:
   - in: path
-    name: id_colaborador
+    name: email
     required: true
     schema:
-      type: number
-    description: ID do colaborador a ser atualizado
+      type: string
+    description: E-mail do colaborador a ser atualizado
 
   - in: body
     name: corpo

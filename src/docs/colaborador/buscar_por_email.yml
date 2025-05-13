@@ -1,0 +1,39 @@
+tags:
+  - Colaborador
+description: Retorna os dados de um colaborador com base no e-mail informado.
+
+parameters:
+  - in: path
+    name: email
+    required: true
+    schema:
+      type: string
+    description: E-mail do colaborador a ser buscado.
+
+responses:
+  200:
+    description: Colaborador encontrado com sucesso.
+    content:
+      application/json:
+        example:
+          mensagem: Colaborador encontrado
+          colaborador:
+            id: 1
+            nome: Marcos Monte
+            email: marcos@email.com
+            cargo: Desenvolvedor
+            foto: /caminho/da/foto.jpg
+            status: ativo
+  404:
+    description: Nenhum colaborador encontrado com o e-mail informado.
+    content:
+      application/json:
+        example:
+          mensagem: Colaborador não encontrado
+  500:
+    description: Erro inesperado ao buscar colaborador.
+    content:
+      application/json:
+        example:
+          erro: Erro ao buscar colaborador
+          detalhes: Descrição do erro técnico

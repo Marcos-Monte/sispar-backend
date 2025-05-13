@@ -114,9 +114,9 @@ def cadastrar_novo_coladorador():
 
 # SInaliza que os dados enviados após o 'atualizar', serão dinamicos e enviados pela URL
 # https://localhost:8000/colaborador/atualizar/500 --> O ID deve estar passando assim
-@bp_colaborador.route('/atualizar/<int:id_colaborador>', methods=['PUT'])
+@bp_colaborador.route('/atualizar/<string:email>', methods=['PUT'])
 @swag_from('../docs/colaborador/atualizar_colaborador.yml') # Integra a função com a documentação desse 'caminho'
-def atualizar_dados_colaborador(id_colaborador):
+def atualizar_dados_colaborador(email):
 
     try:
         dados_requisicao = request.get_json() # Pegando o corpo da requisição enviada pelo Front
@@ -127,11 +127,13 @@ def atualizar_dados_colaborador(id_colaborador):
         if erro:
             return erro
         
-        colaborador = db.session.get(Colaborador, id_colaborador) # Buscando o colaborador pelo id 
+        colaborador = db.session.execute(
+            db.select(Colaborador).where(Colaborador.email == email)
+        ).scalar_one_or_none()
 
         # Vaalidação se o ID existe na aplicação
         if not colaborador:
-            return jsonify({'response': 'Id de usuário não identificado'}), 404
+            return jsonify({'response': 'E-mail de usuário não identificado'}), 404
 
         if 'nome' in dados_requisicao:
             colaborador.nome = dados_requisicao['nome']
@@ -211,3 +213,22 @@ def deletar_por_id(id_colaborador):
     except IntegrityError:
         db.session.rollback()
         return jsonify({'erro': f'Não é possível excluir o colaborador ({colaborador.email}), pois há registros relacionados'}), 400
+    
+@bp_colaborador.route('/buscar/<string:email>', methods=['GET'])
+@swag_from('../docs/colaborador/buscar_por_email.yml')  # Opcional: adicione doc se quiser
+def buscar_colaborador_por_email(email):
+    try:
+        colaborador = db.session.execute(
+            db.select(Colaborador).where(Colaborador.email == email)
+        ).scalar_one_or_none()
+
+        if not colaborador:
+            return jsonify({'mensagem': 'Colaborador não encontrado'}), 404
+        
+        # Não enviamos a senha nesse retorno!
+        dados_colaborador = colaborador.to_dict()
+        dados_colaborador.pop('senha', None)
+
+        return jsonify({'mensagem': 'Colaborador encontrado', 'colaborador': dados_colaborador}), 200
+    except Exception as error:
+        return jsonify({'erro': 'Erro ao buscar colaborador', 'detalhes': str(error)}), 500
