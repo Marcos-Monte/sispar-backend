@@ -47,6 +47,8 @@ def pegar_todos_reembolsos():
 @bp_reembolso.route('/solicitacao', methods=['POST'])
 @swag_from('../docs/reembolso/cadastrar_solicitacoes.yml')
 def solicitar_novo_reembolso():
+    def normalizar_numero(valor):
+        return float(valor) if valor not in ["", None, "null"] else None
     
     try:
         lista_solicitacao = request.get_json() # Recebe os dados da requisição
@@ -60,7 +62,7 @@ def solicitar_novo_reembolso():
             pep = dados_solicitacao.get('pep')
             divisao = dados_solicitacao.get('divisao')
             ordem_interna = dados_solicitacao.get('ordem_interna')
-            
+
             if pep and not (ordem_interna and divisao):
                 if '-' in pep:
                     ordem_interna, divisao = pep.split('-', 1)
@@ -76,25 +78,24 @@ def solicitar_novo_reembolso():
             elif not pep and not (ordem_interna and divisao):
                 return jsonify({'erro': f'{i+1}º Solicitação inválida: Informe "pep" ou "ordem_interna e divisao."'}), 400
             
-            # Criando o objeto a ser inserido no bd
+            # Criação do objeto com tratamento de campos numéricos e strings vazias
             nova_solicitacao = Reembolso(
-                colaborador = dados_solicitacao['colaborador'],
-                empresa = dados_solicitacao['empresa'],
-                # num_prestacao = dados_solicitacao['num_prestacao'],
-                descricao = dados_solicitacao['descricao'],
-                data = dados_solicitacao['data'],
-                tipo_reembolso = dados_solicitacao['tipo_reembolso'],
-                centro_custo = dados_solicitacao['centro_custo'],
-                ordem_interna = ordem_interna,
-                divisao = divisao,
-                pep = pep,
-                moeda = dados_solicitacao['moeda'],
-                distancia_km = dados_solicitacao['distancia_km'],
-                valor_km = dados_solicitacao['valor_km'],
-                valor_faturado = dados_solicitacao['valor_faturado'],
-                despesa = dados_solicitacao['despesa'],
-                id_colaborador = dados_solicitacao['id_colaborador'],
-                status = 'analisando',
+                colaborador=dados_solicitacao['colaborador'],
+                empresa=dados_solicitacao['empresa'],
+                descricao=dados_solicitacao['descricao'],
+                data=dados_solicitacao['data'],
+                tipo_reembolso=dados_solicitacao['tipo_reembolso'],
+                centro_custo=dados_solicitacao['centro_custo'],
+                ordem_interna=ordem_interna,
+                divisao=divisao,
+                pep=pep,
+                moeda=dados_solicitacao['moeda'],
+                distancia_km=str(dados_solicitacao.get('distancia_km') or ""),
+                valor_km=str(dados_solicitacao.get('valor_km') or ""),
+                valor_faturado=normalizar_numero(dados_solicitacao.get('valor_faturado')),
+                despesa=normalizar_numero(dados_solicitacao.get('despesa')),
+                id_colaborador=int(dados_solicitacao['id_colaborador']),
+                status='analisando',
             )
             objetos_solicitacao.append(nova_solicitacao)
             
@@ -143,15 +144,18 @@ def deletar_por_num_prestacao(num_prestacao):
 @bp_reembolso.route('/atualizar/<int:num_prestacao>', methods=['PUT'])
 @swag_from('../docs/reembolso/atualizar_solicitacao.yml')
 def atualizar_reembolso(num_prestacao):
+    def normalizar_numero(valor):
+        return float(valor) if valor not in ["", None, "null"] else None
+
     try:
         dados_reembolso = request.get_json()
         dados_reembolso = padronizar(dados_reembolso)
-        
-        reembolso = db.session.get(Reembolso, num_prestacao) # Buscando o colaborador pelo id 
-        
+
+        reembolso = db.session.get(Reembolso, num_prestacao)
+
         if not reembolso:
             return jsonify({'response': 'Nº de prestação de conta não identificado.'}), 404
-            
+
         if 'colaborador' in dados_reembolso:
             reembolso.colaborador = dados_reembolso['colaborador']
         if 'empresa' in dados_reembolso:
@@ -173,13 +177,13 @@ def atualizar_reembolso(num_prestacao):
         if 'moeda' in dados_reembolso:
             reembolso.moeda = dados_reembolso['moeda']
         if 'distancia_km' in dados_reembolso:
-            reembolso.distancia_km = dados_reembolso['distancia_km']
+            reembolso.distancia_km = str(dados_reembolso['distancia_km'] or "")
         if 'valor_km' in dados_reembolso:
-            reembolso.valor_km = dados_reembolso['valor_km']
+            reembolso.valor_km = str(dados_reembolso['valor_km'] or "")
         if 'valor_faturado' in dados_reembolso:
-            reembolso.valor_faturado = dados_reembolso['valor_faturado']
+            reembolso.valor_faturado = normalizar_numero(dados_reembolso['valor_faturado'])
         if 'despesa' in dados_reembolso:
-            reembolso.despesa = dados_reembolso['despesa']
+            reembolso.despesa = normalizar_numero(dados_reembolso['despesa'])
         if 'status' in dados_reembolso:
             reembolso.status = dados_reembolso['status']
             
