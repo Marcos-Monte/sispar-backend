@@ -21,6 +21,10 @@ def padronizar(dados):
         # Transformando a 'chave' em minúscula
         chave_minuscula = chave.lower()
         
+        if chave == 'foto':
+            novos_dados[chave] = valor  # mantém a URL origina
+            continue
+        
         if isinstance(valor, str): # Só converte strings
             # Transformando o 'valor / string' em minusculo
             valor_minusculo = valor.lower()
