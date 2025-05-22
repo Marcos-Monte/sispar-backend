@@ -60,9 +60,10 @@ DATABASE_URL=mysql://usuario:senha@localhost/nome_do_banco
 | Método | Rota                                  | Descrição                               |
 |--------|---------------------------------------|-----------------------------------------|
 | GET    | `/colaborador/todos-colaboradores`    | Lista todos os colaboradores            |
+| GET    | `/colaborador/buscar/<email>`    | Lista o colaborador pelo email            |
 | POST   | `/colaborador/cadastrar`              | Cadastra um novo colaborador            |
 | POST   | `/colaborador/login`                     | Login de colaborador |
-| PUT    | `/colaborador/atualizar/<id>`         | Atualiza os dados de um colaborador     |
+| PUT    | `/colaborador/atualizar/<email>`         | Atualiza os dados de um colaborador     |
 | DELETE | `/colaborador/deletar/<id>`                     | Deleta um colaborador |
 
 ### 💰 Reembolso

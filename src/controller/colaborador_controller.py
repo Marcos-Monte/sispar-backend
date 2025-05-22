@@ -16,39 +16,9 @@ from flasgger import swag_from # Classe que faz a documentação em yml
 
 from sqlalchemy.exc import IntegrityError
 
-import os # Interação com o sistema operacional. Manipulação de diretórios, arquivos, processos e outros
-import uuid # Criar ID único
-from werkzeug.utils import secure_filename # Lib para fazer upload de imagem do colaborador
-# UPLOAD_FOLDER = 'static/uploads'  # pasta onde as imagens serão salvas
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-UPLOAD_FOLDER = os.path.join(BASE_DIR, '..', '..', 'static', 'uploads') # 'Controi' o caminho para o diretório 'uploads' dentro da estrutura de pastas
-# Certifique-se de que essa pasta existe:
-os.makedirs(UPLOAD_FOLDER, exist_ok=True) #  Se o Diretório Existir retornar ok
-
-# Anteriormente usava se uma lista de dicionario com dados como banco de dados Mockado
-
 # Blueprint -> Conceito de dividir as rotas 
 # Usar o nome do arquivo, recebe a Classe 'Blueprint'
 bp_colaborador = Blueprint('colaborador', __name__, url_prefix='/colaborador') # https://localhost:8000/colaborador
-
-@bp_colaborador.route('/upload-foto', methods=['POST'])
-def upload_foto():
-    if 'foto' not in request.files:
-        return jsonify({'erro': 'Nenhum arquivo enviado'}), 400
-    
-    file = request.files['foto']
-    
-    if file.filename == '':
-        return jsonify({'erro': 'Nome de arquivo inválido'}), 400
-    
-    # Por isso:
-    extensao = os.path.splitext(file.filename)[1]
-    filename = f"{uuid.uuid4().hex}{extensao}"
-    caminho_completo = os.path.join(UPLOAD_FOLDER, filename)
-    file.save(caminho_completo)
-    
-    url_imagem = f"/static/uploads/{filename}"
-    return jsonify({'response': 'Upload feito com sucesso', 'url': url_imagem})
 
 @bp_colaborador.route('/todos-colaboradores')
 @swag_from('../docs/colaborador/listar_colaboradores.yml') # Integra a função com a documentação desse 'caminho'
