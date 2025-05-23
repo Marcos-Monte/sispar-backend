@@ -1,20 +1,16 @@
-# Criando documentação  Endpoint -> http://localhost:5000/colaborador/cadastrar
-
-# Obs prestar atenção na identação
-
 tags: 
-  - Colaborador # Categoria do Endpoint -> referente a interface do Swagger
-description: Cadastrar um novo colaborador # Descrição: o que o endpoint faz (cadastrar um novo colaborador)
+  - Colaborador 
+description: Cadastrar um novo colaborador 
 
 parameters:
-  - in: body  # Vamos informar no 'parameters' que os parametros virão do 'corpo/body' da requisição
+  - in: body  
     name: corpo
-    required: true # Alinhado ao in (não ao traço) -> indica que dentro da requisição o body são obrigatórios
+    required: true 
 
-    schema: # Faz uma função de {json}
-      type: object # o body será um objeto
+    schema: 
+      type: object 
 
-      properties: # propriedades -> cada linha de um body é uma propriedade
+      properties: 
         nome: 
           type: string
           example: joão da silva fredericksen almeida
@@ -31,13 +27,13 @@ parameters:
           type: string
           example: inativo
         salario:
-          type: number # Pega qualquer tipo de números (inteiros ou Reais)
+          type: number 
           example: 3500.50
         foto:
-          type: file # Pega qualquer tipo de números (inteiros ou Reais)
+          type: file 
           example: 
 
-      required: # Quais props serão obrigatorios
+      required: 
         - nome
         - email
         - senha
@@ -45,7 +41,7 @@ parameters:
         - salario
         - status
 
-responses: # Possíveis respostas para as requisições
+responses: 
   201:
     description: Colaborador cadastrado com sucesso
   400:

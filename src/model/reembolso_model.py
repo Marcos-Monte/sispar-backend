@@ -1,52 +1,35 @@
-from src.model import db # Instancia do Banco de Dados
+from src.model import db
 # Importações para criar as tabelas no Banco de Dados
 from sqlalchemy.schema import Column
 from sqlalchemy.types import Integer, String, DECIMAL, DATE
 from sqlalchemy import func # Função geradora (Usado para pegar a data atual do sistema)
 from sqlalchemy  import ForeignKey # Para lidar com chaves estrangeiras
 
-# Classe de Molde
 class Reembolso(db.Model): 
     __tablename__ = 'tb_reembolso' # Cria a tabela com o nome tb_colaborador
-#-------------------------- Atributos ------------------------------------
-    # Tipo de dados + Constraints (Regras)
-    # id = Column(Integer, primary_key=True, autoincrement=True) # Coluna id, tipo inteiro, chave primaria com autoincremento
-    num_prestacao = Column(Integer, primary_key=True, autoincrement=True) # Coluna número de prestação, tipo inteiro
-    colaborador = Column(String(150), nullable=False) # Coluna colaborador, tipo string, não pode ter valores nulos
-    empresa = Column(String(50), nullable=False) # Coluna empresa, tipo string (trabalham com abreviações)
-    # Ícone
-    descricao = Column(String(255)) # Seria a imagem dos tickets de comprovação (poderiamos armazenar imagens e chamar URL ou usar alguma técnica)
-    # No caso de tratar no front, pode gerar erro!
-    data = Column(DATE, default=func.current_date(), nullable=False) # Coluna data, tipo data, (Se não tiver data, pegar a data do dia)
-    # Enumarate (tecnica para lidar com outros Selects)
-    tipo_reembolso = Column(String(35), nullable=False) # Coluna tipo, tipo string (virá de um select no front)
-    centro_custo = Column(String(50), nullable=False) # Coluna centro de custo, tipo string (virá de um select no front)
-    
-    # pep = ordem + divisão -> Fazer regra de negocio para que isso fique disponível no Front
+
+    num_prestacao = Column(Integer, primary_key=True, autoincrement=True) 
+    colaborador = Column(String(150), nullable=False) 
+    empresa = Column(String(50), nullable=False) 
+    descricao = Column(String(255)) 
+    data = Column(DATE, default=func.current_date(), nullable=False)
+    tipo_reembolso = Column(String(35), nullable=False) 
+    centro_custo = Column(String(50), nullable=False) 
     ordem_interna = Column(String(50)) 
     divisao = Column(String(50)) 
     pep = Column(String(50)) 
-    
-    moeda = Column(String(20), nullable=False) # Coluna moeda, tipo string (virá de um select no front)
-    
-    # Função que recebe distancia e indica o valor por km percorrido no valor_faturado (10 x 1 = 10)
+    moeda = Column(String(20), nullable=False)
     distancia_km = Column(String((50)))
     valor_km = Column(String((50)))
-    valor_faturado = Column(DECIMAL(10, 2), nullable=False) # Colocando 10 casas antes da virgula e 2 depois
-    
-    despesa = Column(DECIMAL(10, 2)) # Colocando 10 casas antes da virgula e 2 depois (Adiantamento pode existir ou não)
-    
-    # Chave estrangeira para fixar relacionamento entre essa tabela e a de colaboradores
+    valor_faturado = Column(DECIMAL(10, 2), nullable=False) 
+    despesa = Column(DECIMAL(10, 2)) 
     id_colaborador = Column(Integer, ForeignKey(column='tb_colaborador.id'))
-    status = Column(String(25)) # Colocaremos os 3 status possíveis (todas começam: 'Em análise')
+    status = Column(String(25))
     
-# ----------------------------------------------------------------------------
-    # Método contrutor -> Necessário o atributo 'self'
+    # Métodos Construtores
     def __init__ (self, colaborador, empresa, descricao, data, tipo_reembolso, centro_custo, ordem_interna, divisao, pep, moeda, distancia_km, valor_km, valor_faturado, despesa, id_colaborador, status='analisando'):
-        # self.id = id # Quando o ID é autoincrementado, não precisa estar no Método Construtor
         self.colaborador = colaborador
         self.empresa = empresa
-        # self.num_prestacao = num_prestacao # Quando se é autoincrementado, não precisa estar no Método Construtor
         self.descricao = descricao
         self.data = data
         self.tipo_reembolso = tipo_reembolso
@@ -62,7 +45,7 @@ class Reembolso(db.Model):
         self.id_colaborador = id_colaborador
         self.status = status
 
-# --------------------Métodos ---------------------------------------------------
+    # Retornos
     def all_data(self) -> dict:
         return {
             'colaborador': self.colaborador,

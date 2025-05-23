@@ -1,13 +1,8 @@
-# Importa o objeto 'environ' para acessar variáveis de ambiente do sistema
 from os import environ
-
-# Importa a função 'load_dotenv' para carregar variáveis de ambiente definidas em um arquivo .env
 from dotenv import load_dotenv
 
-# Carrega as variáveis de ambiente do arquivo .env para serem acessíveis via 'environ'
 load_dotenv()
 
-# Classe de configuração principal da aplicação
 class Config:
     ENV = environ.get("FLASK_ENV", "development")
     

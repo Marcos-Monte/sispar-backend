@@ -1,31 +1,10 @@
-#Tarefa -> Implementação
-
-# 2 Rotas
-## 1 - Visualização de TODOS OS REEMBOLSOS -> GET
-### ID_COLABORADOR -> Associar todos os reembolsos a um único ID
-
-## 2 - Solicitação de Reembolso -> POST
-
-
-
-# -------------------------------------------------------------------------------
-# # Tarefa -> Implementação
-
-# Rota de visualização de todos os reembolsos -> GET
-# Solicitação de reembolsos -> POST
-
-# Para enviar multiplos dados para o BD, utilize: db.session.bulk_save_objects(lista[instancias])
-
 from flask import Blueprint, request, jsonify
-
-from src.model.reembolso_model import Reembolso
+from flasgger import swag_from # Classe que faz a documentação em yml
 from src.model import db # Retirado do __ini__ da pasta Model
-
+from src.model.reembolso_model import Reembolso
 from src.services.utils import padronizar
 
-from flasgger import swag_from # Classe que faz a documentação em yml
-
-bp_reembolso = Blueprint('reembolso', __name__, url_prefix='/reembolso')# https://localhost:8000/reembolsos
+bp_reembolso = Blueprint('reembolso', __name__, url_prefix='/reembolso')
 
 @bp_reembolso.route('/reembolsos')
 @swag_from('../docs/reembolso/listar_reembolsos.yml')
@@ -51,12 +30,13 @@ def solicitar_novo_reembolso():
         return float(valor) if valor not in ["", None, "null"] else None
     
     try:
-        lista_solicitacao = request.get_json() # Recebe os dados da requisição
+        lista_solicitacao = request.get_json() 
     
-        # Validações
+
         if not lista_solicitacao:
             return jsonify({'erro': 'A lista de solicitações está vazia. Envie pelo menos um reembolso.'}), 400
         objetos_solicitacao = []
+        
         # Percorrer a lista recebida e criar um objeto para cada item da lista
         for i, dados_solicitacao in enumerate(lista_solicitacao):
             pep = dados_solicitacao.get('pep')
@@ -78,7 +58,6 @@ def solicitar_novo_reembolso():
             elif not pep and not (ordem_interna and divisao):
                 return jsonify({'erro': f'{i+1}º Solicitação inválida: Informe "pep" ou "ordem_interna e divisao."'}), 400
             
-            # Criação do objeto com tratamento de campos numéricos e strings vazias
             nova_solicitacao = Reembolso(
                 colaborador=dados_solicitacao['colaborador'],
                 empresa=dados_solicitacao['empresa'],
